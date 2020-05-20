@@ -1,0 +1,45 @@
+version: '3'
+services:
+  web: 
+    image: webdevops/php-nginx-dev:7.2
+    container_name: tp_php
+    ports:
+      - 80:80
+    networks:
+      - tp_net
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+        - ./webdata:/app
+        - ./www.conf:/opt/docker/etc/nginx/vhost.conf
+  mysql:
+    image: mysql:5.7
+    container_name: tp_mysql
+    ports:
+      - 3306:3306
+    networks:
+      - tp_net
+    environment:
+      MYSQL_ROOT_PASSWORD: lizhijun
+    volumes:
+      - data:/var/lib/mysql
+      - ./mysql_db/config/my.cnf:/etc/mysql/my.cnf
+      - ./mysql_db/init:/docker-entrypoint-initdb.d/
+  redis:
+    image: redis
+    container_name: tp_redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis_db:/data
+    networks:
+      - tp_net
+    command: ['redis-server', '--requirepass', 'lizhijun', '--appendonly', 'yes']
+
+networks: 
+  tp_net:
+
+volumes:
+  data:
+    driver: local
