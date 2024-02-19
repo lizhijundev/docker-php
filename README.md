@@ -1,4 +1,4 @@
-docker compose Thinkphp
+docker compose for php
 =====
 
 mysql_db：mysql目录
