@@ -1,31 +1,50 @@
 version: '3'
 services:
-  web: 
-    image: webdevops/php-nginx-dev:7.2
-    container_name: web_php
+  nginx:
+    image: nginx:latest
     ports:
-      - 80:80
-    networks:
-      - web_net
+      - "8001:80"
+    volumes:
+      - ./www.conf:/etc/nginx/nginx.conf
+      - /Users/bob/dev/lizhi-api:/var/www/html
     depends_on:
-      - mysql
-      - redis
-    volumes:
-        - ./webdata:/app
-        - ./www.conf:/opt/docker/etc/nginx/vhost.conf
-  mysql:
-    image: mysql:5.7
-    container_name: web_mysql
-    ports:
-      - 3306:3306
+      - php
     networks:
       - web_net
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+  node16:
+    image: node:16
     volumes:
-      - data:/var/lib/mysql
-      - ./mysql_db/config/my.cnf:/etc/mysql/my.cnf
-      - ./mysql_db/init:/docker-entrypoint-initdb.d/
+      - /Users/bob/dev/lizhi-api:/var/www/html
+    command: sh -c "npm config set registry https://registry.npmmirror.com && tail -f /dev/null"
+    networks:
+      - web_net
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /Users/bob/dev/lizhi-api:/var/www/html
+    command: php-fpm
+    ports:
+      - "9000:9000"
+    environment:
+      PHP_IDE_CONFIG: serverName=lizhijun-server
+    networks:
+      - web_net
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Lrdxsadf12
+      MYSQL_DATABASE: base
+      MYSQL_USER: lizhijun
+      MYSQL_PASSWORD: Lrdxsadf12
+    volumes:
+      - ./mysql_db/init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql_db/data:/var/lib/mysql
+
   redis:
     image: redis:7.0.15
     container_name: web_redis
@@ -39,6 +58,7 @@ services:
 
 networks: 
   web_net:
+    driver: bridge
 
 volumes:
   data:

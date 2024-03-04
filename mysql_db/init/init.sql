@@ -1,2 +1,2 @@
-CREATE USER 'admin'@'%' IDENTIFIED BY 'lizhijun';
-GRANT All privileges ON *.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'Lrdxsadf12' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'lizhijun'@'%' IDENTIFIED BY 'lizhijun';
